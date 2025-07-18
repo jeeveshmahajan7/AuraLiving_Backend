@@ -28,31 +28,6 @@ app.get("/products", async (req, res) => {
   try {
     const products = await getProducts();
     if (products.length > 0) {
-      res.status("200").json({
-        message: "Products fetched successfully.",
-        products: products,
-      });
-    } else {
-      res.status(404).json({ message: "Products not found." });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch products." });
-  }
-});
-
-const test = async () => {
-  try {
-    const products = await Product.find();
-    return products;
-  } catch (error) {
-    console.log("Error fetching products", error);
-  }
-};
-
-app.get("/test", async (req, res) => {
-  try {
-    const products = await test();
-    if (products && products.length > 0) {
       res.status(200).json({
         message: "Products fetched successfully.",
         products: products,
