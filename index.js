@@ -40,13 +40,12 @@ app.get("/products", async (req, res) => {
   }
 });
 
-const createNewProduct = async (newProduct) => {
+const test = async () => {
   try {
-    const product = new Product(newProduct);
-    const saveProduct = await product.save();
-    return saveProduct;
+    const products = await Product.find();
+    return products;
   } catch (error) {
-    console.log("Error creating new product:", error);
+    console.log("Error fetching products", error);
   }
 };
 
@@ -65,6 +64,16 @@ app.get("/test", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch products." });
   }
 });
+
+const createNewProduct = async (newProduct) => {
+  try {
+    const product = new Product(newProduct);
+    const saveProduct = await product.save();
+    return saveProduct;
+  } catch (error) {
+    console.log("Error creating new product:", error);
+  }
+};
 
 app.post("/product", async (req, res) => {
   try {
