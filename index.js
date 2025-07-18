@@ -50,6 +50,22 @@ const createNewProduct = async (newProduct) => {
   }
 };
 
+app.get("/test", async (req, res) => {
+  try {
+    const products = await test();
+    if (products && products.length > 0) {
+      res.status(200).json({
+        message: "Products fetched successfully.",
+        products: products,
+      });
+    } else {
+      res.status(404).json({ message: "Products not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch products." });
+  }
+});
+
 app.post("/product", async (req, res) => {
   try {
     const newProduct = await createNewProduct(req.body);
