@@ -7,7 +7,7 @@ const importProducts = async () => {
 
   try {
     const products = JSON.parse(
-      fs.readFileSync("data/products_final_data.json", "utf-8")
+      fs.readFileSync("data/products_final.json", "utf-8")
     );
     await Product.insertMany(products);
     console.log("Products seeded successfully.");
