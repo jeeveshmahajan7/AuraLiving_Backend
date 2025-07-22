@@ -66,6 +66,16 @@ app.post("/product", async (req, res) => {
   }
 });
 
+// to delete app products from the db
+app.delete("/products", async (req, res) => {
+  try {
+    await Product.deleteMany({});
+    res.status(200).json({ message: "All products deleted." });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete products." });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log("Server is running on PORT", PORT);
