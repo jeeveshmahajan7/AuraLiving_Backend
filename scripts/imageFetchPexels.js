@@ -3,7 +3,7 @@ require("dotenv").config();
 const fetch = require("node-fetch"); // npm install node-fetch@2
 
 const accessKey = process.env.PEXELS_KEY;
-const products = require("../products_500.json");
+const products = require("../data/products_data");
 
 const fetchImageUrl = async (query) => {
   const res = await fetch(
@@ -41,10 +41,7 @@ const fetchImageUrl = async (query) => {
     }
   }
 
-  fs.writeFileSync(
-    "products_500_real_images.json",
-    JSON.stringify(products, null, 2)
-  );
+  fs.writeFileSync("../data/products_final.json", JSON.stringify(products, null, 2));
 
   console.log("🎉 Done! See products_500_real_images.json");
 })();
