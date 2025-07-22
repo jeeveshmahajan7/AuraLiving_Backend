@@ -66,7 +66,7 @@ app.post("/product", async (req, res) => {
   }
 });
 
-// to delete app products from the db
+// to delete all products from the db
 app.delete("/products", async (req, res) => {
   try {
     await Product.deleteMany({});
