@@ -38,7 +38,7 @@ app.get("/products", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Failed to fetch products.", error: error });
+      .json({ message: "Failed to fetch products.", error: error.message });
   }
 });
 
@@ -66,7 +66,7 @@ app.post("/product", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Failed to create new product.", error: error });
+      .json({ message: "Failed to create new product.", error: error.message });
   }
 });
 
