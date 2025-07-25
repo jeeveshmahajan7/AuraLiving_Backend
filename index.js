@@ -76,7 +76,38 @@ app.delete("/products", async (req, res) => {
     await Product.deleteMany({});
     res.status(200).json({ message: "All products deleted." });
   } catch (err) {
-    res.status(500).json({ message: "Failed to delete products." });
+    res
+      .status(500)
+      .json({ message: "Failed to delete products.", error: error.message });
+  }
+});
+
+// get product by productId from the db
+
+const findProductById = async (productId) => {
+  try {
+    const productById = await Product.findById(productId);
+    return productById;
+  } catch (error) {
+    console.log("Error finding the product:", error.message);
+  }
+};
+
+app.get("/products/:productId", async (req, res) => {
+  try {
+    const productById = await findProductById(req.params.productId);
+    if (productById) {
+      res
+        .status(200)
+        .json({ message: "Found product by Id.", product: productById });
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch product by productId.",
+      error: error.message,
+    });
   }
 });
 
