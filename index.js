@@ -93,7 +93,7 @@ const findProductById = async (productId) => {
   }
 };
 
-app.get("/products/:productId", async (req, res) => {
+app.get("/products/details/:productId", async (req, res) => {
   try {
     const productById = await findProductById(req.params.productId);
     if (productById) {
