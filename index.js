@@ -24,6 +24,7 @@ const getProducts = async () => {
   }
 };
 
+// to get all the products from the db
 app.get("/products", async (req, res) => {
   try {
     const products = await getProducts();
@@ -42,6 +43,7 @@ app.get("/products", async (req, res) => {
   }
 });
 
+// save a new product into the db
 const createNewProduct = async (newProduct) => {
   try {
     const product = new Product(newProduct);
@@ -83,7 +85,6 @@ app.delete("/products", async (req, res) => {
 });
 
 // get product by productId from the db
-
 const findProductById = async (productId) => {
   try {
     const productById = await Product.findById(productId);
