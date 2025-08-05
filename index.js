@@ -5,6 +5,7 @@ require("dotenv").config();
 const { initializeDatabase } = require("./db/db.connect");
 const Product = require("./models/products.model");
 const seedDefaultUser = require("./scripts/seedDefaultUser");
+const AuraUser = require("./models/users.model");
 
 const app = express();
 
@@ -124,6 +125,84 @@ app.get("/products/details/:productId", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch product by productId.",
+      error: error.message,
+    });
+  }
+});
+
+// find a user by Id
+const findUserById = async (userId) => {
+  try {
+    const user = await AuraUser.findById(userId);
+    return user;
+  } catch (error) {
+    console.log("Error finding user by Id:", error.message);
+  }
+};
+
+// add a new address for user
+app.post("/users/:userId/address", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId);
+    if (user) {
+      user.address.push(req.body);
+      await user.save();
+      res.status(200).json({ message: "Successfully added user address." });
+    } else {
+      res.status(404).json({ error: "User not found." });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to add user address by Id.",
+      error: error.message,
+    });
+  }
+});
+
+// update existing address for user
+app.put("/users/:userId/address/:addressId", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId); // using the same helper function
+    const address = user.address.id(req.params.addressId);
+    const updatedAddress = req.body;
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (!address) return res.status(404).json({ error: "Address not found." });
+
+    Object.assign(address, updatedAddress); // applies changes
+    await user.save(); // persists changes
+    res.status(200).json({ message: "Address updated successfully." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update user address by user and address Id.",
+      error: error.message,
+    });
+  }
+});
+
+// delete an address for the user
+app.delete("/users/:userId/address/:addressId", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId); // using the same helper function
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const address = user.address.id(req.params.addressId);
+
+    if (!address) {
+      return res.status(404).json({ error: "Address not found." });
+    }
+
+    address.remove(); // works only if 'address' exists
+    await user.save(); // makes the changes persist
+
+    res.status(200).json({ message: "Address successfully deleted." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete address by user and address Id.",
       error: error.message,
     });
   }
