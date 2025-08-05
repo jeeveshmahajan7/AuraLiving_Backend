@@ -1,19 +1,36 @@
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+
 const { initializeDatabase } = require("./db/db.connect");
 const Product = require("./models/products.model");
-initializeDatabase();
+const seedDefaultUser = require("./scripts/seedDefaultUser");
 
-const express = require("express");
 const app = express();
-const cors = require("cors");
 
+// CORS setup
 const corsOptions = {
   origin: "*",
   credentials: true,
   optionSuccessStatus: 200,
 };
-
 app.use(express.json());
 app.use(cors(corsOptions));
+
+// Initialize database and seed user
+initializeDatabase()
+  .then(async () => {
+    await seedDefaultUser(); // seed after DB connection
+
+    // Start the server only after DB and seeding are done
+    const PORT = 3000;
+    app.listen(PORT, () => {
+      console.log("Server is running on PORT", PORT);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Failed to connect to database:", err.message);
+  });
 
 const getProducts = async () => {
   try {
@@ -110,9 +127,4 @@ app.get("/products/details/:productId", async (req, res) => {
       error: error.message,
     });
   }
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log("Server is running on PORT", PORT);
 });
