@@ -26,6 +26,6 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-const User = mongoose.model("User", userSchema);
+const AuraUser = mongoose.model("AuraUser", userSchema);
 
-module.exports = User;
+module.exports = AuraUser;

@@ -1,11 +1,11 @@
-const User = require("../models/users.model");
+const AuraUser = require("../models/users.model");
 require("dotenv").config();
 
 const seedDefaultUser = async () => {
-  const existing = await User.findOne({ email: process.env.DEFAULT_EMAIL });
+  const existing = await AuraUser.findOne({ email: process.env.DEFAULT_EMAIL });
 
   if (!existing) {
-    const user = new User({
+    const user = new AuraUser({
       name: process.env.DEFAULT_NAME,
       email: process.env.DEFAULT_EMAIL,
       phoneNumber: process.env.DEFAULT_PHONE,
