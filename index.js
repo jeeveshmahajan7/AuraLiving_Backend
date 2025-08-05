@@ -1,5 +1,5 @@
 const { initializeDatabase } = require("./db/db.connect");
-const Product = require("./models/product.model");
+const Product = require("./models/products.model");
 initializeDatabase();
 
 const express = require("express");
