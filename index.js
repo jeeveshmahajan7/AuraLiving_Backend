@@ -19,19 +19,15 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 // Initialize database and seed user
-initializeDatabase()
-  .then(async () => {
-    await seedDefaultUser(); // seed after DB connection
-
-    // Start the server only after DB and seeding are done
-    const PORT = 3000;
-    app.listen(PORT, () => {
-      console.log("Server is running on PORT", PORT);
-    });
-  })
-  .catch((err) => {
+(async () => {
+  try {
+    await initializeDatabase();
+    await seedDefaultUser();
+    console.log("Connected to the Database.✅");
+  } catch (err) {
     console.error("❌ Failed to connect to database:", err.message);
-  });
+  }
+})();
 
 const getProducts = async () => {
   try {
@@ -207,3 +203,11 @@ app.delete("/users/:userId/address/:addressId", async (req, res) => {
     });
   }
 });
+
+// Export for Vercel - to start the server
+module.exports = app;
+
+// local dev server
+if (process.env.NODE_ENV !== "production") {
+  app.listen(3000, () => console.log("Local server running."));
+}
