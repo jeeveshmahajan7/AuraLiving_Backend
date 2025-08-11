@@ -204,6 +204,75 @@ app.delete("/users/:userId/address/:addressId", async (req, res) => {
   }
 });
 
+// add a product to user favorites
+app.post("/users/:userId/favorites/:productId", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId);
+    if (!user) return res.status(404).json({ error: "User not found." });
+
+    const productId = req.params.productId;
+    // prevent duplicates
+    if (user.favoriteProducts.includes(productId)) {
+      return res
+        .status(400)
+        .json({ message: "Product is already in user favorites." });
+    }
+
+    user.favoriteProducts.push(productId);
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Product successfully added to user favorites." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to add product to user favorites.",
+      error: error.message,
+    });
+  }
+});
+
+// delete a product from user favorites
+app.delete("/users/:userId/favorites/:productId", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId);
+    if (!user) return res.status(404).json({ error: "User not found." });
+
+    const productId = req.params.productId;
+    user.favoriteProducts = user.favoriteProducts.filter(
+      (favId) => favId.toString() !== productId
+    );
+    await user.save();
+
+    res.status(200).json({ message: "Product removed from favorites." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete product from user favorites.",
+      error: error.message,
+    });
+  }
+});
+
+// get all favorites products of the user
+app.get("/users/:userId/favorites", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId);
+    if (!user) return res.status(404).json({ error: "User not found." });
+    await user.populate("favoriteProducts");
+    // populate to get full product objects and not just the id
+
+    res.status(200).json({
+      message: "Successfully fetched user favorites.",
+      favoriteProducts: user.favoriteProducts,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch user favorites.",
+      error: error.message,
+    });
+  }
+});
+
 // Export for Vercel - to start the server
 module.exports = app;
 

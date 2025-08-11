@@ -24,6 +24,12 @@ const userSchema = new mongoose.Schema({
       isDefault: Boolean,
     },
   ],
+  favoriteProducts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    },
+  ],
 });
 
 const AuraUser = mongoose.model("AuraUser", userSchema);
