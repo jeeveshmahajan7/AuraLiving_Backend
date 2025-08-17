@@ -288,10 +288,11 @@ const findCartByUserId = async (userId) => {
 app.post("/users/:userId/cart/:productId", async (req, res) => {
   try {
     const { userId, productId } = req.params;
-    const userCart = await findCartByUserId(userId); // using the findCartByUserId helper function
+    let userCart = await findCartByUserId(userId); // using the findCartByUserId helper function
 
+    // create a cart if it does not already exist, this will happen only once when first product is added
     if (!userCart) {
-      return res.status(404).json({ message: "No cart found for the user." });
+      userCart = new Cart({ user: userId, items: [] });
     }
 
     // find whether product already exists in the cart
