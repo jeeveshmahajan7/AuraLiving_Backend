@@ -6,6 +6,7 @@ const { initializeDatabase } = require("./db/db.connect");
 const Product = require("./models/products.model");
 const seedDefaultUser = require("./scripts/seedDefaultUser");
 const AuraUser = require("./models/users.model");
+const Cart = require("./models/cart.model");
 
 const app = express();
 
@@ -268,6 +269,124 @@ app.get("/users/:userId/favorites", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch user favorites.",
+      error: error.message,
+    });
+  }
+});
+
+// find cart by userId
+const findCartByUserId = async (userId) => {
+  try {
+    const cartById = await Cart.findOne({ user: userId });
+    return cartById;
+  } catch (error) {
+    console.log("Error finding cart by userId:", error.message);
+  }
+};
+
+// add product to cart
+app.post("/users/:userId/cart/:productId", async (req, res) => {
+  try {
+    const { userId, productId } = req.params;
+    const userCart = await findCartByUserId(userId); // using the findCartByUserId helper function
+
+    if (!userCart) {
+      return res.status(404).json({ message: "No cart found for the user." });
+    }
+
+    // find whether product already exists in the cart
+    const existingItem = userCart.items.find(
+      (item) => item.product.toString() === productId
+    );
+
+    if (existingItem) {
+      existingItem.quantity += 1; // increase quantity if it already exists
+    } else {
+      userCart.items.push({ product: productId, quantity: 1 }); // push the productId if it does not exist already
+    }
+
+    await userCart.save();
+
+    res.status(200).json({ message: "Product added to cart", cart: userCart });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to add product to cart.",
+      error: error.message,
+    });
+  }
+});
+
+// remove product from cart if qty is 1 or {all=true} in request url / decrease the qty if it is greater than 1
+// So, if you want to remove the item from the cart regardless of the qty, include: ?all=true (at the end of the request url)
+app.delete("/users/:userId/cart/:productId", async (req, res) => {
+  try {
+    const { userId, productId } = req.params;
+    const removeAll = req.query.all === "true"; // ?all=true in request url
+
+    const userCart = await findCartByUserId(userId); // using the same findCartByUserId helper function
+
+    if (!userCart) {
+      return res.status(404).json({ message: "No cart found for the user." });
+    }
+
+    // find whether product already exists in the cart
+    const existingItem = userCart.items.find(
+      (item) => item.product.toString() === productId
+    );
+
+    if (!existingItem) {
+      return res.status(404).json({
+        message: "Product not found in the cart.",
+      });
+    }
+
+    if (existingItem.quantity === 1 || removeAll) {
+      // remove the whole product
+      userCart.items = userCart.items.filter(
+        (item) => item.product.toString() !== productId
+      );
+    } else {
+      // decrease the qty if it is greater than 1
+      existingItem.quantity -= 1;
+    }
+
+    await userCart.save();
+
+    res.status(200).json({
+      message:
+        removeAll || existingItem.quantity === 1
+          ? "Product removed from the cart."
+          : "Product quantity decreased.",
+      cart: userCart,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete product from the cart.",
+      error: error.message,
+    });
+  }
+});
+
+// fetch all products from cart
+app.get("/users/:userId/cart", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const userCart = await findCartByUserId(userId);
+
+    if (!userCart) {
+      return res.status(404).json({ message: "Cart not found for the user." });
+    }
+
+    await userCart.populate("items.product");
+
+    res.status(200).json({
+      message: "Cart fetched successfully.",
+      cart: userCart.items,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch products from the cart.",
       error: error.message,
     });
   }
