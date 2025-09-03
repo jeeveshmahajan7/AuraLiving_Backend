@@ -413,7 +413,7 @@ app.get("/users/:userId/cart", async (req, res) => {
 });
 
 // create order in orders
-app.post("/users/:userId/orders");
+// app.post("/users/:userId/orders");
 
 // Export for Vercel - to start the server
 module.exports = app;
