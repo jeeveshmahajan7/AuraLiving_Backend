@@ -137,6 +137,25 @@ const findUserById = async (userId) => {
   }
 };
 
+// fetch user details
+app.get("/user/:userId/details", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId);
+    if (user) {
+      res.status(200).json({ message: "Found the user.", userDetails: user });
+    } else {
+      res.status(404).json({ message: "User not found." });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Failed to fetch user.",
+        error: error.message || "Unknown error",
+      });
+  }
+});
+
 // add a new address for user
 app.post("/users/:userId/address", async (req, res) => {
   try {
@@ -392,6 +411,9 @@ app.get("/users/:userId/cart", async (req, res) => {
     });
   }
 });
+
+// create order in orders
+app.post("/users/:userId/orders");
 
 // Export for Vercel - to start the server
 module.exports = app;
