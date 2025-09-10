@@ -7,6 +7,7 @@ const Product = require("./models/products.model");
 const seedDefaultUser = require("./scripts/seedDefaultUser");
 const AuraUser = require("./models/users.model");
 const Cart = require("./models/cart.model");
+const Order = require("./models/orders.model");
 
 const app = express();
 
@@ -147,12 +148,10 @@ app.get("/user/:userId/details", async (req, res) => {
       res.status(404).json({ message: "User not found." });
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Failed to fetch user.",
-        error: error.message || "Unknown error",
-      });
+    res.status(500).json({
+      message: "Failed to fetch user.",
+      error: error.message || "Unknown error",
+    });
   }
 });
 
@@ -413,7 +412,36 @@ app.get("/users/:userId/cart", async (req, res) => {
 });
 
 // create order in orders
-// app.post("/users/:userId/orders");
+app.post("/users/:userId/orders", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { products, totalPrice, address } = req.body;
+
+    if (!products || !products.length) {
+      return res.status(400).json({ message: "No products in order." });
+    }
+
+    const newOrder = new Order({
+      user: userId,
+      products,
+      totalPrice,
+      address,
+    });
+
+    await newOrder.save();
+
+    // clearing the cart after placing an order
+    await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+
+    res
+      .status(201)
+      .json({ message: "Order Placed Successfully", order: newOrder });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to place order", error: error.message });
+  }
+});
 
 // Export for Vercel - to start the server
 module.exports = app;
