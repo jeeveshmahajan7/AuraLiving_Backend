@@ -448,7 +448,7 @@ const findOrdersByUserId = async (userId) => {
   try {
     const orderById = await Order.find({ user: userId }).populate(
       "products.product",
-      "name price"
+      "title price"
     );
     return orderById;
   } catch (error) {
