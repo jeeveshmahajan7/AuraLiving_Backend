@@ -443,6 +443,38 @@ app.post("/users/:userId/orders", async (req, res) => {
   }
 });
 
+// helper to find orders by userId
+const findOrdersByUserId = async (userId) => {
+  try {
+    const orderById = await Order.find({ user: userId });
+    return orderById;
+  } catch (error) {
+    console.log("Error finding orders by userId:", error.message);
+  }
+};
+
+// fetch all orders
+app.get("/users/:userId/orders", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const orders = await findOrdersByUserId(userId);
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for user." });
+    }
+
+    res.status(200).json({
+      message: "Successfully fetched orders for user.",
+      orders: orders,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch orders.", error: error.message });
+  }
+});
+
 // Export for Vercel - to start the server
 module.exports = app;
 
