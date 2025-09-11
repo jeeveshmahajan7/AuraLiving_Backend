@@ -446,7 +446,10 @@ app.post("/users/:userId/orders", async (req, res) => {
 // helper to find orders by userId
 const findOrdersByUserId = async (userId) => {
   try {
-    const orderById = await Order.find({ user: userId });
+    const orderById = await Order.find({ user: userId }).populate(
+      "products.product",
+      "name price"
+    );
     return orderById;
   } catch (error) {
     console.log("Error finding orders by userId:", error.message);
