@@ -212,13 +212,15 @@ app.delete("/users/:userId/address/:addressId", async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    const address = user.address.id(req.params.addressId);
+    const addressId = req.params.addressId;
+    const address = user.address.id(addressId);
 
     if (!address) {
       return res.status(404).json({ error: "Address not found." });
     }
 
-    address.remove(); // works only if 'address' exists
+    // Use pull to remove the address
+    user.address.pull({ _id: addressId });
     await user.save(); // makes the changes persist
 
     res.status(200).json({ message: "Address successfully deleted." });
