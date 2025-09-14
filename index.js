@@ -159,13 +159,20 @@ app.get("/users/:userId/details", async (req, res) => {
 app.post("/users/:userId/address", async (req, res) => {
   try {
     const user = await findUserById(req.params.userId);
-    if (user) {
-      user.address.push(req.body);
-      await user.save();
-      res.status(200).json({ message: "Successfully added user address." });
-    } else {
-      res.status(404).json({ error: "User not found." });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
     }
+
+    if (req.body.isDefault) {
+      user.address.forEach((addr) => {
+        addr.isDefault = false;
+      });
+    }
+
+    user.address.push(req.body);
+    await user.save();
+    res.status(200).json({ message: "Successfully added user address." });
   } catch (error) {
     res.status(500).json({
       message: "Failed to add user address by Id.",
