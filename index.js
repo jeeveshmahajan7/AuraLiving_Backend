@@ -139,7 +139,7 @@ const findUserById = async (userId) => {
 };
 
 // fetch user details
-app.get("/user/:userId/details", async (req, res) => {
+app.get("/users/:userId/details", async (req, res) => {
   try {
     const user = await findUserById(req.params.userId);
     if (user) {
