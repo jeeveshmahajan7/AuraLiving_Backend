@@ -192,6 +192,10 @@ app.put("/users/:userId/address/:addressId", async (req, res) => {
 
     if (!address) return res.status(404).json({ error: "Address not found." });
 
+    if (updatedAddress.isDefault === true) {
+      user.address.forEach((addr) => (addr.isDefault = false));
+    }
+
     Object.assign(address, updatedAddress); // applies changes
     await user.save(); // persists changes
     res.status(200).json({ message: "Address updated successfully." });
