@@ -203,6 +203,28 @@ app.put("/users/:userId/address/:addressId", async (req, res) => {
   }
 });
 
+// mark an address as default
+app.put("/users/:userId/address/:addressId/default", async (req, res) => {
+  try {
+    const user = await findUserById(req.params.userId);
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    const address = user.address.id(req.params.addressId);
+    if (!address) return res.status(404).json({ error: "Address not found" });
+    // reset all addresses
+    user.address.forEach((addr) => (addr.isDefault = false));
+    address.isDefault = true; // mark current address as default
+
+    await user.save();
+    res.status(200).json({ message: "Default address updated successfully." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update default address.",
+      error: error.message,
+    });
+  }
+});
+
 // delete an address for the user
 app.delete("/users/:userId/address/:addressId", async (req, res) => {
   try {
