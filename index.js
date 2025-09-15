@@ -172,7 +172,9 @@ app.post("/users/:userId/address", async (req, res) => {
 
     user.address.push(req.body);
     await user.save();
-    res.status(200).json({ message: "Successfully added user address." });
+
+    const savedAddress = user.address[user.address.length - 1]; // last pushed
+    res.status(201).json(savedAddress); // return the saved address with _id for ui
   } catch (error) {
     res.status(500).json({
       message: "Failed to add user address by Id.",
