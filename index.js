@@ -452,7 +452,7 @@ app.get("/users/:userId/cart", async (req, res) => {
 app.post("/users/:userId/orders", async (req, res) => {
   try {
     const { userId } = req.params;
-    const { products, totalPrice, address } = req.body;
+    const { products, totalPrice, address, status } = req.body;
 
     if (!products || !products.length) {
       return res.status(400).json({ message: "No products in order." });
@@ -463,6 +463,7 @@ app.post("/users/:userId/orders", async (req, res) => {
       products,
       totalPrice,
       address,
+      status: status || "Pending",
     });
 
     await newOrder.save();
