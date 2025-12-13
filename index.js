@@ -21,15 +21,23 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 // Initialize database and seed user
-(async () => {
+let isConnected = false;
+
+async function connectDB() {
+  if (isConnected) return; // prevent running multiple times
+
   try {
     await initializeDatabase();
     await seedDefaultUser();
-    console.log("Connected to the Database.✅");
+    isConnected = true;
+    console.log("DB Connected & User Seeded");
   } catch (err) {
-    console.error("❌ Failed to connect to database:", err.message);
+    console.error("DB Connection Failed:", err.message);
   }
-})();
+}
+
+connectDB();
+
 
 const getProducts = async () => {
   try {
@@ -520,6 +528,6 @@ app.get("/users/:userId/orders", async (req, res) => {
 module.exports = app;
 
 // local dev server
-if (process.env.NODE_ENV !== "production") {
-  app.listen(3000, () => console.log("Local server running."));
+if (!process.env.VERCEL) {
+  app.listen(3000, () => console.log("Local server running"));
 }
